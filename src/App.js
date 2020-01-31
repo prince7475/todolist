@@ -5,27 +5,22 @@ import Header from "./components/layout/Header";
 import AddTodo from "./components/AddTodo";
 import uuid from "uuid";
 import About from "./components/pages/About";
+import axios from "axios";
 class App extends Component {
   state = {
-    todos: [
-      {
-        id: uuid.v4(),
-        title: "Take out the trash",
-        completed: false
-      },
-      {
-        id: uuid.v4(),
-        title: "Make dinner",
-        completed: false
-      },
-      {
-        id: uuid.v4(),
-        title: "meeting with boss",
-        completed: false
-      }
-    ],
+    todos: [],
     title: ""
   };
+
+  componentDidMount() {
+    console.log("component mounted");
+    axios
+      .get("https://jsonplaceholder.typicode.com/posts?_limit=10")
+      .then(response => {
+        console.log("response", response.data);
+        this.setState({ todos: response.data });
+      });
+  }
 
   checkBoxOnChange = id => {
     const currentTodo = this.state.todos;
@@ -44,11 +39,14 @@ class App extends Component {
   };
 
   deleteItemById = id => {
-    this.setState({
-      todos: this.state.todos.filter(todo => {
-        return todo.id != id;
-      })
-    });
+    axios.delete(`https://jsonplaceholder.typicode.com/posts/${id}`).then((response) => {
+      this.setState({
+        todos: this.state.todos.filter(todo => {
+          return todo.id != id;
+        })
+      });
+    })
+
   };
 
   titleOnChange = event => {
@@ -59,21 +57,29 @@ class App extends Component {
   };
 
   addTodo = title => {
-    this.setState({
-      ...this.state,
-      todos: this.state.todos.concat({ id: uuid.v4(), title, completed: false })
-    });
+    axios
+      .post("https://jsonplaceholder.typicode.com/posts", {
+        userId: uuid.v4(),
+        title,
+        body: title
+      })
+      .then(response => {
+        console.log('response', response)
+        this.setState({
+          ...this.state,
+          todos: this.state.todos.concat(response.data)
+        });
+      });
   };
 
   render() {
-    console.log(this.state.todos);
     return (
       <Router>
         <div className="container">
           <Header />
           <Switch>
             <Route
-            exact
+              exact
               path="/"
               render={props => (
                 <React.Fragment>
