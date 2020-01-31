@@ -15,7 +15,9 @@ import PropTypes from 'prop-types'
 }
 
 Todos.propTypes = {
-    todos: PropTypes.array.isRequired
+    todos: PropTypes.array.isRequired,
+    checkBoxOnChange: PropTypes.func.isRequired,
+    deleteItemById: PropTypes.func.isRequired
 }
 
 export default Todos
